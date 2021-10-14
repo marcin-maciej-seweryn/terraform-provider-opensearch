@@ -31,9 +31,9 @@ func resourceClusterSettings() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 						autoCreateIndexConfig: {
 							Type: schema.TypeString,
-							Description: "Automatically create indexes when a request is received." +
-								"The operation automatically creates the index and applies any matching index templates." +
-								"If no mapping exists, the index operation creates a dynamic mapping." +
+							Description: "Automatically create indexes when a request is received. " +
+								"The operation automatically creates the index and applies any matching index templates. " +
+								"If no mapping exists, the index operation creates a dynamic mapping. " +
 								"Accepted values are: true, false or comma-separated list of patterns you want to allow," +
 								" or each pattern prefixed with + or - to indicate whether it should be allowed or blocked",
 							Optional:         true,
