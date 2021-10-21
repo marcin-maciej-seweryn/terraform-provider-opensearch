@@ -39,5 +39,8 @@ resource "opensearch_cluster_settings" "this" {
 - `endpoint`: (String) Server's URL
 
 ### Optional
-- `aws_request_signing`: (Block List, Max: 1) Sign requests according to AWS requirements. It requires AWS credentials to be accessible through default provider chain
+- `aws_request_signing`: (Block List, Max: 1)
+ Sign requests according to AWS requirements.
+ It requires AWS credentials to be accessible through default provider chain
   - `region`: (String) AWS Region
+  - `role`: (String, Optional) ARN of the role to assume to perform the operation

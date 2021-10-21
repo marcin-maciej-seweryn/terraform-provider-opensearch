@@ -7,6 +7,7 @@ import (
 	"terraform-provider-opensearch/signing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -17,6 +18,7 @@ const (
 	endpointConfig          = "endpoint"
 	awsRequestSigningConfig = "aws_request_signing"
 	awsRegionConfig         = "region"
+	awsRoleConfig           = "role"
 )
 
 func Provider() *schema.Provider {
@@ -40,6 +42,11 @@ func Provider() *schema.Provider {
 							Type:        schema.TypeString,
 							Description: "AWS Region",
 							Required:    true,
+						},
+						awsRoleConfig: {
+							Type:        schema.TypeString,
+							Description: "ARN of the role to assume when getting AWS credentials",
+							Optional:    true,
 						},
 					},
 				},
@@ -72,18 +79,31 @@ func createSigner(d *schema.ResourceData) (signing.Signer, diag.Diagnostics) {
 
 	if v, ok := d.GetOk(awsRequestSigningConfig); ok {
 		if len(v.([]interface{})) > 0 && v.([]interface{})[0] != nil {
-			signingConfig := v.([]interface{})[0].(map[string]interface{})
-			if region, ok := signingConfig[awsRegionConfig].(string); ok && region != "" {
-				sess, err := session.NewSession(&aws.Config{
-					CredentialsChainVerboseErrors: aws.Bool(true),
-				})
-				if err != nil {
-					return nil, diag.FromErr(err)
-				}
-				return signing.NewAwsSigner(region, sess.Config.Credentials), diags
-			} else {
-				return nil, diag.Errorf("unable to parse config %s", awsRegionConfig)
+			awsConfig := aws.Config{
+				CredentialsChainVerboseErrors: aws.Bool(true),
 			}
+
+			signingConfig := v.([]interface{})[0].(map[string]interface{})
+
+			region, ok := signingConfig[awsRegionConfig].(string)
+			if !ok || region == "" {
+				return nil, diag.Errorf("unable to parse config %s", awsRegionConfig)
+			} else {
+				awsConfig.Region = &region
+			}
+
+			sess, err := session.NewSession(&awsConfig)
+			if err != nil {
+				return nil, diag.FromErr(err)
+			}
+
+			creds := sess.Config.Credentials
+			role, ok := signingConfig[awsRoleConfig].(string)
+			if ok && role != "" {
+				creds = stscreds.NewCredentials(sess, role)
+			}
+
+			return signing.NewAwsSigner(region, creds), diags
 		} else {
 			return nil, diag.Errorf("unable to parse config %s", awsRequestSigningConfig)
 		}
