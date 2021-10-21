@@ -3,7 +3,7 @@ HOSTNAME=localhost
 NAMESPACE=marcin-maciej-seweryn
 NAME=opensearch
 BINARY=terraform-provider-opensearch
-VERSION=1.0.0
+VERSION=1.1.0
 OS_ARCH=darwin_amd64
 
 default: install

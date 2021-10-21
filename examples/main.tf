@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     opensearch = {
-      version = "1.0.0"
-      source = "localhost/marcin-maciej-seweryn/opensearch"
+      version = "1.1.0"
+      source  = "localhost/marcin-maciej-seweryn/opensearch"
     }
   }
 }
