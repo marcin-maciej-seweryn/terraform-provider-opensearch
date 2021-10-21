@@ -59,6 +59,9 @@ fabric.properties
 *.tfstate
 *.tfstate.*
 
+# .lock.hcl
+**/.terraform.lock.hcl
+
 # Crash log files
 crash.log
 
@@ -86,4 +89,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+### MacOs
+.DS_Store
 
